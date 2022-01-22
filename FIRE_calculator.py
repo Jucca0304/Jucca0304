@@ -14,51 +14,79 @@ def fire():
         income_change = int(ent_income_change.get())
         expenses_change = int(ent_expenses_change.get())
         taxrate = int(ent_taxrate.get())
+
         years = 0
         x = []
-        y_income = []
+
+        # Totals
         y_networth = []
-        y_expenses = []
-        y_sr = []
+        y_saved = []
+        y_interest_collected = []
+
+        # Annual
+        y_annual_saving = []
+        y_annual_interest = []
+        saved = 0
+        interest_collected = 0
+
         while networth < expenses / (100 - taxrate) * 100 * (100 / swr):
             income = income / 100 * (100 + income_change)
             expenses = expenses / 100 * (100 + expenses_change)
             networth = (networth + income - expenses) / 100 * (100 + interest)
             years = years + 1
+            saved = saved + income - expenses
+            interest_collected = interest_collected + (networth + income - expenses) * interest / 100
+            annual_saving = income - expenses
+            annual_interest = (networth + income - expenses) * interest / 100
+
+            ## Data for Graphs
             x.append(years)
-            y_income.append(income)
             y_networth.append(networth)
-            y_expenses.append(expenses)
+            y_saved.append(saved)
+            y_interest_collected.append(interest_collected)
+            y_annual_saving.append(annual_saving)
+            y_annual_interest.append(annual_interest)
+
             if years >= 50:
-                lbl_result["text"] = 'Fire is not achievable under these condition'
                 break
-            else:
-                ## Figure
-                fig, ax = plt.subplots(figsize = (7, 5),
-                             dpi = 100)
-                ## Plots
-                ax.plot(x, y_income, color='green')
-                ax.plot(x, y_expenses, color='red')
-                ax.plot(x, y_networth, color='blue')
+        if years >=50:
+            lbl_result["text"] = 'Fire is not achievable under these condition'
 
-                ## Styling
-                ax.legend(['Income', 'Expenses', 'Networth'])
-                plt.title("Your FIRE networth of {:,.0f} € is reached after {} years".format(int(networth), years))
-                plt.style.use('ggplot')
-                plt.ylabel('€')
-                plt.xlabel('YEARS')
-                ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x / 1000) + 'K'))
-                plt.xticks(np.arange(min(x), max(x)+1, 1))
-                plt.yticks(np.arange(0, max(y_networth), 100000))
+        else:
+            lbl_result["text"] = "You will achieve FIRE in {} years with a networth of {:,.0f} €".format(years, int(networth))
+            ## Figure
+            plt.style.use('ggplot')
+            fig, axs = plt.subplots(nrows=2, sharex=True, figsize=(7,5))
+            ## Plots
+            axs[0].plot(x, y_networth, color='blue')
+            axs[0].plot(x, y_saved, color='green')
+            axs[0].plot(x, y_interest_collected, color='purple')
+            axs[1].plot(x, y_annual_saving, color='green')
+            axs[1].plot(x, y_annual_interest, color='purple')
 
-                ## Adding to Window
-                canvas = FigureCanvasTkAgg(fig, master=window)
-                canvas.draw()
-                canvas.get_tk_widget().grid(row=3, column=0, padx=10)
-                frm_toolbar = tk.Frame(master=window)
-                frm_toolbar.grid(row=4, column=0, padx=10)
-                toolbar = NavigationToolbar2Tk(canvas, frm_toolbar)
-                toolbar.update()
+            ## Styling
+            axs[0].set_title('Networth')
+            axs[1].set_title('Annual Savings vs. Interest')
+            axs[0].legend(['Networth', 'Saved', 'Interest Collected'])
+            axs[1].legend(['Saving', 'Interest'])
+            axs[0].yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x / 1000) + 'K'))
+            axs[1].yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x / 1000) + 'K'))
+            plt.xticks(np.arange(min(x), max(x)+1, 1))
+
+            # Hide x labels and tick labels for top plots and y ticks for right plots.
+            for ax in axs.flat:
+                ax.set(xlabel='YEARS', ylabel='€')
+            for ax in axs.flat:
+                ax.label_outer()
+
+            ## Adding to Window
+            canvas = FigureCanvasTkAgg(fig, master=window)
+            canvas.draw()
+            canvas.get_tk_widget().grid(row=3, column=0, padx=10)
+            frm_toolbar = tk.Frame(master=window)
+            frm_toolbar.grid(row=4, column=0, padx=10)
+            toolbar = NavigationToolbar2Tk(canvas, frm_toolbar)
+            toolbar.update()
 
     except ValueError:
         lbl_result["text"] = 'Please make sure to enter values in all fields!'
@@ -76,6 +104,7 @@ frm_entry = tk.Frame(master=window)
 lbl_networth = tk.Label(master=frm_entry, text="Networth:")
 ent_networth = tk.Entry(master=frm_entry, width=10)
 lbl_networth_cur = tk.Label(master=frm_entry, text="€")
+ent_networth.insert(0, '130000')
 
 lbl_networth.grid(row=2, column=0, sticky="w")
 ent_networth.grid(row=2, column=1, sticky="e")
@@ -85,6 +114,7 @@ lbl_networth_cur.grid(row=2, column=2, sticky="w")
 lbl_income = tk.Label(master=frm_entry, text="Income:")
 ent_income = tk.Entry(master=frm_entry, width=10)
 lbl_income_cur = tk.Label(master=frm_entry, text="€")
+ent_income.insert(0, '60000')
 
 lbl_income.grid(row=0, column=0, sticky="w")
 ent_income.grid(row=0, column=1, sticky="e")
@@ -94,6 +124,7 @@ lbl_income_cur.grid(row=0, column=2, sticky="w")
 lbl_expenses = tk.Label(master=frm_entry, text="Expenses:")
 ent_expenses = tk.Entry(master=frm_entry, width=10)
 lbl_expenses_cur = tk.Label(master=frm_entry, text="€")
+ent_expenses.insert(0, '26000')
 
 lbl_expenses.grid(row=1, column=0, sticky="w")
 ent_expenses.grid(row=1, column=1, sticky="e")
@@ -103,7 +134,7 @@ lbl_expenses_cur.grid(row=1, column=2, sticky="w")
 lbl_income_change = tk.Label(master=frm_entry, text="Income Change:")
 ent_income_change = tk.Entry(master=frm_entry, width=10)
 lbl_income_change_cur = tk.Label(master=frm_entry, text="%")
-ent_income_change.insert(0, '0')
+ent_income_change.insert(0, '3')
 
 lbl_income_change.grid(row=0, column=3, sticky="w")
 ent_income_change.grid(row=0, column=4, sticky="e")
@@ -113,7 +144,7 @@ lbl_income_change_cur.grid(row=0, column=5, sticky="w")
 lbl_expenses_change = tk.Label(master=frm_entry, text="Expenses Change:")
 ent_expenses_change = tk.Entry(master=frm_entry, width=10)
 lbl_expenses_change_cur = tk.Label(master=frm_entry, text="%")
-ent_expenses_change.insert(0, '0')
+ent_expenses_change.insert(0, '2')
 
 lbl_expenses_change.grid(row=1, column=3, sticky="w")
 ent_expenses_change.grid(row=1, column=4, sticky="e")
@@ -142,7 +173,7 @@ lbl_swr_cur.grid(row=1, column=8, sticky="w")
 lbl_taxrate = tk.Label(master=frm_entry, text="Taxrate:")
 ent_taxrate = tk.Entry(master=frm_entry, width=10)
 lbl_taxrate_cur = tk.Label(master=frm_entry, text="%")
-ent_taxrate.insert(0, '0')
+ent_taxrate.insert(0, '20')
 
 lbl_taxrate.grid(row=2, column=6, sticky="w")
 ent_taxrate.grid(row=2, column=7, sticky="e")
