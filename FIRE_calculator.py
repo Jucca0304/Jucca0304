@@ -56,7 +56,7 @@ def fire():
             lbl_result["text"] = "You will achieve FIRE in {} years with a networth of {:,.0f} €".format(years, int(networth))
             ## Figure
             plt.style.use('ggplot')
-            fig, axs = plt.subplots(nrows=2, sharex=True, figsize=(7,5))
+            fig, axs = plt.subplots(nrows=2, sharex=True)
             ## Plots
             axs[0].plot(x, y_networth, color='blue')
             axs[0].plot(x, y_saved, color='green')
@@ -78,7 +78,6 @@ def fire():
                 ax.set(xlabel='YEARS', ylabel='€')
             for ax in axs.flat:
                 ax.label_outer()
-
             ## Adding to Window
             canvas = FigureCanvasTkAgg(fig, master=window)
             canvas.draw()
@@ -104,7 +103,6 @@ frm_entry = tk.Frame(master=window)
 lbl_networth = tk.Label(master=frm_entry, text="Networth:")
 ent_networth = tk.Entry(master=frm_entry, width=10)
 lbl_networth_cur = tk.Label(master=frm_entry, text="€")
-ent_networth.insert(0, '130000')
 
 lbl_networth.grid(row=2, column=0, sticky="w")
 ent_networth.grid(row=2, column=1, sticky="e")
@@ -114,7 +112,6 @@ lbl_networth_cur.grid(row=2, column=2, sticky="w")
 lbl_income = tk.Label(master=frm_entry, text="Income:")
 ent_income = tk.Entry(master=frm_entry, width=10)
 lbl_income_cur = tk.Label(master=frm_entry, text="€")
-ent_income.insert(0, '60000')
 
 lbl_income.grid(row=0, column=0, sticky="w")
 ent_income.grid(row=0, column=1, sticky="e")
@@ -124,7 +121,6 @@ lbl_income_cur.grid(row=0, column=2, sticky="w")
 lbl_expenses = tk.Label(master=frm_entry, text="Expenses:")
 ent_expenses = tk.Entry(master=frm_entry, width=10)
 lbl_expenses_cur = tk.Label(master=frm_entry, text="€")
-ent_expenses.insert(0, '26000')
 
 lbl_expenses.grid(row=1, column=0, sticky="w")
 ent_expenses.grid(row=1, column=1, sticky="e")
@@ -134,7 +130,7 @@ lbl_expenses_cur.grid(row=1, column=2, sticky="w")
 lbl_income_change = tk.Label(master=frm_entry, text="Income Change:")
 ent_income_change = tk.Entry(master=frm_entry, width=10)
 lbl_income_change_cur = tk.Label(master=frm_entry, text="%")
-ent_income_change.insert(0, '3')
+ent_income_change.insert(0, '0')
 
 lbl_income_change.grid(row=0, column=3, sticky="w")
 ent_income_change.grid(row=0, column=4, sticky="e")
@@ -144,7 +140,7 @@ lbl_income_change_cur.grid(row=0, column=5, sticky="w")
 lbl_expenses_change = tk.Label(master=frm_entry, text="Expenses Change:")
 ent_expenses_change = tk.Entry(master=frm_entry, width=10)
 lbl_expenses_change_cur = tk.Label(master=frm_entry, text="%")
-ent_expenses_change.insert(0, '2')
+ent_expenses_change.insert(0, '0')
 
 lbl_expenses_change.grid(row=1, column=3, sticky="w")
 ent_expenses_change.grid(row=1, column=4, sticky="e")
@@ -173,18 +169,20 @@ lbl_swr_cur.grid(row=1, column=8, sticky="w")
 lbl_taxrate = tk.Label(master=frm_entry, text="Taxrate:")
 ent_taxrate = tk.Entry(master=frm_entry, width=10)
 lbl_taxrate_cur = tk.Label(master=frm_entry, text="%")
-ent_taxrate.insert(0, '20')
+ent_taxrate.insert(0, '0')
 
 lbl_taxrate.grid(row=2, column=6, sticky="w")
 ent_taxrate.grid(row=2, column=7, sticky="e")
 lbl_taxrate_cur.grid(row=2, column=8, sticky="w")
 
-#Calculate Button
+# Calculate Button
 btn_calculate = tk.Button(
     master=window,
     text="Calculate",
     command=fire
 )
+# Bind 'ENTER' to Function
+#window.bind('<Return>', fire)
 
 # Result
 ## Text
